@@ -1,2 +1,2 @@
-# dictionary
-Simulation of a dictionary for the Italian language written in C
+# labyrinth
+A game in C where a robot walks in a labyrinth
