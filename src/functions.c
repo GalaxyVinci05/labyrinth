@@ -126,13 +126,12 @@ Posizione genera_posizione(Stanza stanza)
 {
     Posizione pos;
 
-    // Controllando che la casella sia di tipo 'Libera', assicura che le posizioni generate non sovrappongano spazi gia' occupati
     do
     {
         pos.y = rand() % (DIMENSIONE-2) + 1;
         pos.x = rand() % (DIMENSIONE-2) + 1;
     }
-    while (stanza.griglia[pos.y][pos.x].tipo != Libera);
+    while (stanza.griglia[pos.y][pos.x].tipo != Libera);  // Verificando che la casella sia di tipo 'Libera', assicura che le posizioni generate non sovrappongano spazi gia' occupati
 
     return pos;
 }
