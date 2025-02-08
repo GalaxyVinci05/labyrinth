@@ -1,7 +1,14 @@
-#include <stdio.h>
+#include "functions.h"
 
 int main(void)
 {
-    printf("shish");
+    Stanza stanza;
+    Robot robot;
+
+    inizializza_stanza(&stanza);
+    inizializza_robot(&stanza, &robot);
+
+    disegna_stanza(stanza, robot);
+
     return 0;
 }
