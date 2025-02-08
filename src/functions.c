@@ -111,8 +111,7 @@ void disegna_stanza(Stanza stanza, Robot robot)
         {
             // Disegna il robot nella mappa
             if (robot.pos.y == i && robot.pos.x == j)
-            {
-                printf("%c ", robot.visuale);            }
+                printf("%c ", robot.visuale);
             else
                 printf("%c ", stanza.griglia[i][j].visuale);
         }
