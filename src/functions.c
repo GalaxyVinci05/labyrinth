@@ -1,7 +1,7 @@
 #include "functions.h"
 #include "types.h"
 
-#define N_PARETI 5
+#define N_PARETI 4
 
 void inizializza_stanza(Stanza* stanza)
 {
@@ -71,11 +71,15 @@ void inizializza_pareti(Stanza *stanza)
     *  Sono previste soltanto pareti orizzontali o verticali.
     */
     Posizione pos_pareti[N_PARETI][2] = {
-        { { 2, 4 }, { 2, 8 } },
-        { { 6, 3 }, { 12, 3 } },
-        { { 4, 6 }, { 7, 6 } },
-        { { 8, 10 }, { 8, 14 } },
-        { { 12, 7 }, { 12, 12 } }
+        //{ { 2, 4 }, { 2, 8 } },
+        //{ { 6, 3 }, { 12, 3 } },
+        //{ { 4, 6 }, { 7, 6 } },
+        //{ { 8, 10 }, { 8, 14 } },
+        //{ { 12, 7 }, { 12, 12 } }
+        { { 2, 3 }, { 9, 3 } },
+        { { 8, 7 }, { 14, 7 } },
+        { { 3, 7 }, { 3, 14 } },
+        { { 10, 11 }, { 10, 13 } }
     };
 
     Casella parete = { Parete, '#' };
@@ -133,4 +137,32 @@ Posizione genera_posizione(Stanza stanza)
     while (stanza.griglia[pos.y][pos.x].tipo != Libera);  // Verificando che la casella sia di tipo 'Libera', assicura che le posizioni generate non sovrappongano spazi gia' occupati
 
     return pos;
+}
+
+// Dest(inazione): utilizza il vettore Posizione come direzione ( {0,1} {0,-1} {1,0} {-1,0} )
+Ostacolo trova_ostacolo(Stanza stanza, Posizione dest)
+{
+    Ostacolo ostacolo;
+    Posizione pos_temp;
+    Casella casella_temp;
+
+    do
+    {
+        pos_temp.y += dest.y;
+        pos_temp.x += dest.x;
+
+        casella_temp = stanza.griglia[pos_temp.y][pos_temp.x];
+
+        if (casella_temp.tipo == Parete)
+            ostacolo.priorita = Alta;
+        else if (casella_temp.tipo == BucoNero)
+            ostacolo.priorita = Media;
+        else if (casella_temp.calpestata)
+            ostacolo.priorita = Bassa;
+
+        ostacolo.direzione++;
+
+    }
+    while (casella_temp.tipo == Libera);
+
 }

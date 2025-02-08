@@ -13,6 +13,21 @@ typedef enum
     Uscita
 } TipoCasella;
 
+typedef enum
+{
+    Bassa,
+    Media,
+    Alta  // = insuperabile
+} PrioritaOstacolo;
+
+typedef enum
+{
+    Su,
+    Giu,
+    Destra,
+    Sinistra
+} Direzione;
+
 typedef struct
 {
     int y;
@@ -37,5 +52,12 @@ typedef struct
     char visuale;
     Posizione pos;
 } Robot;
+
+typedef struct
+{
+    int distanza;
+    Direzione direzione;
+    PrioritaOstacolo priorita;
+} Ostacolo;
 
 #endif /* Tipi_h */
