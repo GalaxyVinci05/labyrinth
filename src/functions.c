@@ -164,7 +164,7 @@ Ostacolo trova_ostacolo(Stanza *stanza, Robot robot, Vettore2D dir)
         casella_temp = stanza->griglia[pos_temp.y][pos_temp.x];
         ostacolo.distanza++;
     }
-    while (casella_temp.tipo == Libera);
+    while (casella_temp.tipo == Libera && !casella_temp.calpestata);
 
     if (casella_temp.tipo == Parete)
         ostacolo.priorita = Alta;
