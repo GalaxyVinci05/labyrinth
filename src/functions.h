@@ -10,14 +10,15 @@
 // Stanza
 void inizializza_stanza(Stanza*);
 void inizializza_pareti(Stanza*);
-void disegna_stanza(Stanza, Robot);
+void disegna_stanza(Stanza*, Robot);
 
 // Robot
 void inizializza_robot(Stanza*, Robot*);
-void sposta_robot(Stanza*, Robot*, int, int);
-Ostacolo trova_ostacolo(Stanza, Posizione);
+void muovi_robot(Stanza*, Robot*);
+Ostacolo trova_ostacolo(Stanza*, Robot, Vettore2D);
+Vettore2D scegli_direzione(Stanza*, Robot);
 
 // Altre
-Posizione genera_posizione(Stanza);
+Vettore2D genera_posizione(Stanza*);
 
 #endif /* Funzioni_h */

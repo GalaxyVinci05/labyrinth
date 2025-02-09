@@ -6,6 +6,8 @@ int main(void)
     Robot robot;
     bool game_over = false;
 
+    srand(time(NULL));    // Imposta il seed per la generazione pseudocasuale
+
     inizializza_stanza(&stanza);
     inizializza_robot(&stanza, &robot);
 
@@ -14,7 +16,7 @@ int main(void)
     
     do
     {
-        disegna_stanza(stanza, robot);
+        disegna_stanza(&stanza, robot);
 
         printf("\nN. Passi: %d", passi);
         printf("\nPremi INVIO per continuare...\n");
@@ -25,6 +27,8 @@ int main(void)
             exit(0);
 
         while (input != '\n');
+
+        muovi_robot(&stanza, &robot);
         passi++;
     }
     while (!game_over);

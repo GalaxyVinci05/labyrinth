@@ -1,5 +1,6 @@
 #include "functions.h"
 #include "types.h"
+#include <stdlib.h>
 
 #define N_PARETI 4
 
@@ -10,7 +11,7 @@ void inizializza_stanza(Stanza* stanza)
     {
         for (int j = 0; j < DIMENSIONE; j++)
         {
-            Posizione pos = { j, i };
+            Vettore2D pos = { j, i };
             Casella vuoto = { Libera, ' ', false, pos };
 
             stanza->griglia[i][j] = vuoto;
@@ -35,13 +36,11 @@ void inizializza_stanza(Stanza* stanza)
     Casella uscita = { Uscita, 'E', false };
     stanza->griglia[DIMENSIONE-2][0] = uscita;
 
-    srand(time(NULL));    // Imposta il seed per la generazione pseudocasuale
-
     // Genera buchi neri e botole casualmente
     for (int i = 0; i < 5; i++)
     {
-        Posizione pos_buco = genera_posizione(*stanza);
-        Posizione pos_botola = genera_posizione(*stanza);
+        Vettore2D pos_buco = genera_posizione(stanza);
+        Vettore2D pos_botola = genera_posizione(stanza);
 
         Casella buco_nero = { BucoNero, 'X', false };
         Casella botola = { Botola, 'O', false };
@@ -53,7 +52,7 @@ void inizializza_stanza(Stanza* stanza)
 
 void inizializza_robot(Stanza *stanza, Robot *robot)
 {
-    Posizione pos = genera_posizione(*stanza);
+    Vettore2D pos = genera_posizione(stanza);
     Robot nuovo_robot = { '*', pos };
 
     *robot = nuovo_robot;
@@ -70,7 +69,7 @@ void inizializza_pareti(Stanza *stanza)
     *  E' previsto che si inserisca nella y o x finale un valore maggiore di quello nella y o x iniziale.
     *  Sono previste soltanto pareti orizzontali o verticali.
     */
-    Posizione pos_pareti[N_PARETI][2] = {
+    Vettore2D pos_pareti[N_PARETI][2] = {
         //{ { 2, 4 }, { 2, 8 } },
         //{ { 6, 3 }, { 12, 3 } },
         //{ { 4, 6 }, { 7, 6 } },
@@ -86,8 +85,8 @@ void inizializza_pareti(Stanza *stanza)
 
     for (int i = 0; i < N_PARETI; i++)
     {
-        Posizione inizio = pos_pareti[i][0];
-        Posizione fine = pos_pareti[i][1];
+        Vettore2D inizio = pos_pareti[i][0];
+        Vettore2D fine = pos_pareti[i][1];
 
         // Parete orizzontale
         if (inizio.y == fine.y)
@@ -107,7 +106,7 @@ void inizializza_pareti(Stanza *stanza)
     }
 }
 
-void disegna_stanza(Stanza stanza, Robot robot)
+void disegna_stanza(Stanza *stanza, Robot robot)
 {
     for (int i = 0; i < DIMENSIONE; i++)
     {
@@ -117,52 +116,165 @@ void disegna_stanza(Stanza stanza, Robot robot)
             if (robot.pos.y == i && robot.pos.x == j)
                 printf("%c ", robot.visuale);
             else
-                printf("%c ", stanza.griglia[i][j].visuale);
+                printf("%c ", stanza->griglia[i][j].visuale);
         }
 
         printf("\n");
     }
 }
 
-// Genera una posizione casuale nella mappa
-Posizione genera_posizione(Stanza stanza)
+void muovi_robot(Stanza *stanza, Robot *robot)
 {
-    Posizione pos;
+    Vettore2D direzione;
+    direzione = scegli_direzione(stanza, *robot);
+
+    robot->pos.y += direzione.y;
+    robot->pos.x += direzione.x;
+
+    stanza->griglia[robot->pos.y][robot->pos.x].calpestata = true;
+}
+
+// Genera una posizione casuale nella mappa
+Vettore2D genera_posizione(Stanza *stanza)
+{
+    Vettore2D pos;
 
     do
     {
         pos.y = rand() % (DIMENSIONE-2) + 1;
         pos.x = rand() % (DIMENSIONE-2) + 1;
     }
-    while (stanza.griglia[pos.y][pos.x].tipo != Libera);  // Verificando che la casella sia di tipo 'Libera', assicura che le posizioni generate non sovrappongano spazi gia' occupati
+    while (stanza->griglia[pos.y][pos.x].tipo != Libera);  // Verificando che la casella sia di tipo 'Libera', assicura che le posizioni generate non sovrappongano spazi gia' occupati
 
     return pos;
 }
 
-// Dest(inazione): utilizza il vettore Posizione come direzione ( {0,1} {0,-1} {1,0} {-1,0} )
-Ostacolo trova_ostacolo(Stanza stanza, Posizione dest)
+// Dir(ezione): utilizza Vettore2D come direzione ( {0,1} {0,-1} {1,0} {-1,0} )
+Ostacolo trova_ostacolo(Stanza *stanza, Robot robot, Vettore2D dir)
 {
-    Ostacolo ostacolo;
-    Posizione pos_temp;
+    Ostacolo ostacolo = { 0 };
+    Vettore2D pos_temp = robot.pos;
     Casella casella_temp;
 
     do
     {
-        pos_temp.y += dest.y;
-        pos_temp.x += dest.x;
+        pos_temp.y += dir.y;
+        pos_temp.x += dir.x;
 
-        casella_temp = stanza.griglia[pos_temp.y][pos_temp.x];
-
-        if (casella_temp.tipo == Parete)
-            ostacolo.priorita = Alta;
-        else if (casella_temp.tipo == BucoNero)
-            ostacolo.priorita = Media;
-        else if (casella_temp.calpestata)
-            ostacolo.priorita = Bassa;
-
-        ostacolo.direzione++;
-
+        casella_temp = stanza->griglia[pos_temp.y][pos_temp.x];
+        ostacolo.distanza++;
     }
     while (casella_temp.tipo == Libera);
 
+    if (casella_temp.tipo == Parete)
+        ostacolo.priorita = Alta;
+    else if (casella_temp.tipo == BucoNero)
+        ostacolo.priorita = Media;
+    else if (casella_temp.calpestata)
+        ostacolo.priorita = Bassa;
+
+    return ostacolo;
 }
+
+// Sceglie la direzione in base alla distanza e la priorita' degli ostacoli
+Vettore2D scegli_ddirezione(Stanza *stanza, Robot robot)
+{
+    Vettore2D direzioni[4] = {
+        { -1, 0 },  // Su'
+        { 1, 0 },   // Giu'
+        { 0, 1 },   // Destra
+        { 0, -1 }   // Sinistra
+    };
+
+    Ostacolo ostacoli[4];
+    int indice_dir = 0;
+
+    for (int i = 0; i < 4; i++)
+    {
+        ostacoli[i] = trova_ostacolo(stanza, robot, direzioni[i]);
+        
+        if (ostacoli[i].distanza > ostacoli[indice_dir].distanza)
+            indice_dir = i;
+        else if (ostacoli[i].distanza == ostacoli[indice_dir].distanza)
+        {
+            if (ostacoli[i].priorita < ostacoli[indice_dir].priorita)
+                indice_dir = i;
+            else
+                indice_dir = rand() % 4;
+        }
+    }
+
+    // TODO: add candidates and choose random iterative between them
+
+    return direzioni[indice_dir];
+}
+
+// TODO: remove (generated)
+Vettore2D scegli_direzione(Stanza *stanza, Robot robot)
+{
+    Vettore2D direzioni[4] = {
+        { -1, 0 },  // Su
+        { 1, 0 },   // Giù
+        { 0, 1 },   // Destra
+        { 0, -1 }   // Sinistra
+    };
+
+    Ostacolo ostacoli[4];
+    // Ottieni gli ostacoli per ogni direzione
+    for (int i = 0; i < 4; i++)
+    {
+        ostacoli[i] = trova_ostacolo(stanza, robot, direzioni[i]);
+    }
+    
+    // Trova il massimo valore di distanza
+    int max_distanza = -1;
+    for (int i = 0; i < 4; i++)
+    {
+        if (ostacoli[i].distanza > max_distanza)
+            max_distanza = ostacoli[i].distanza;
+    }
+    
+    // Raccogli gli indici che hanno la distanza massima
+    int candidati[4];
+    int num_candidati = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        if (ostacoli[i].distanza == max_distanza)
+        {
+            candidati[num_candidati] = i;
+            num_candidati++;
+        }
+    }
+    
+    // Se c'è un solo candidato, lo scegliamo
+    int indice_scelto = candidati[0];
+    
+    // Se ce ne sono più di uno, scegliamo quello con la priorità migliore.
+    // Supponendo che un valore minore di Priorita sia migliore (ad esempio, Bassa = 0 < Media = 1 < Alta = 2)
+    for (int i = 1; i < num_candidati; i++)
+    {
+        int idx = candidati[i];
+        if (ostacoli[idx].priorita < ostacoli[indice_scelto].priorita)
+        {
+            indice_scelto = idx;
+        }
+        // Se la priorità è anch'essa uguale, possiamo decidere casualmente
+        else if (ostacoli[idx].priorita == ostacoli[indice_scelto].priorita)
+        {
+            if (rand() % 2)
+            {
+                indice_scelto = idx;
+            }
+        }
+    }
+
+    int random = rand() % 10;
+    if (random > 7)
+    {
+        int n = rand() % 4;
+        return direzioni[n];
+    }
+    
+    return direzioni[indice_scelto];
+}
+

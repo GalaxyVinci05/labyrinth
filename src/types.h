@@ -32,14 +32,14 @@ typedef struct
 {
     int y;
     int x;
-} Posizione;
+} Vettore2D;
 
 typedef struct
 {
     TipoCasella tipo;
     char visuale;    // Carattere con cui visualizzare la casella
     bool calpestata;
-    Posizione pos;
+    Vettore2D pos;
 } Casella;
 
 typedef struct
@@ -50,13 +50,13 @@ typedef struct
 typedef struct
 {
     char visuale;
-    Posizione pos;
+    Vettore2D pos;
 } Robot;
 
 typedef struct
 {
     int distanza;
-    Direzione direzione;
+    // Vettore2D direzione;
     PrioritaOstacolo priorita;
 } Ostacolo;
 
