@@ -14,9 +14,10 @@ void disegna_stanza(Stanza*, Robot);
 
 // Robot
 void inizializza_robot(Stanza*, Robot*);
-void muovi_robot(Stanza*, Robot*);
+void muovi_robot(Stanza*, Robot*, Evento*);
 Ostacolo trova_ostacolo(Stanza*, Robot, Vettore2D);
 Vettore2D scegli_direzione(Stanza*, Robot);
+int scegli_candidato(Ostacolo*, int);
 
 // Altre
 Vettore2D genera_posizione(Stanza*);

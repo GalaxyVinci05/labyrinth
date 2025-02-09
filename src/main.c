@@ -4,20 +4,19 @@ int main(void)
 {
     Stanza stanza;
     Robot robot;
-    bool game_over = false;
+    Evento evento;
 
     srand(time(NULL));    // Imposta il seed per la generazione pseudocasuale
 
     inizializza_stanza(&stanza);
     inizializza_robot(&stanza, &robot);
+    disegna_stanza(&stanza, robot);
 
     int input;
     int passi = 0;
     
     do
     {
-        disegna_stanza(&stanza, robot);
-
         printf("\nN. Passi: %d", passi);
         printf("\nPremi INVIO per continuare...\n");
         input = getchar();
@@ -28,10 +27,28 @@ int main(void)
 
         while (input != '\n');
 
-        muovi_robot(&stanza, &robot);
+        muovi_robot(&stanza, &robot, &evento);
+        disegna_stanza(&stanza, robot);
         passi++;
+
+        if (evento.botola)
+        {
+            printf("\nBotola!\n");
+            evento.botola = false;
+        }
     }
-    while (!game_over);
+    while (!evento.game_over && !evento.vinto);
+
+    if (evento.vinto)
+    {
+        printf("\nHai vinto!\n");
+        printf("\nN. Passi: %d", passi);
+    }
+    else
+    {
+        printf("\nHai perso!\n");
+        printf("\nN. Passi: %d", passi);
+    }
 
     return 0;
 }

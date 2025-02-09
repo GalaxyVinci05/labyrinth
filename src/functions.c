@@ -1,6 +1,5 @@
 #include "functions.h"
 #include "types.h"
-#include <stdlib.h>
 
 #define N_PARETI 4
 
@@ -56,7 +55,7 @@ void inizializza_robot(Stanza *stanza, Robot *robot)
     Robot nuovo_robot = { '*', pos };
 
     *robot = nuovo_robot;
-    stanza->griglia[pos.y][pos.x].calpestata = true;
+    // stanza->griglia[pos.y][pos.x].calpestata = true;
 }
 
 void inizializza_pareti(Stanza *stanza)
@@ -81,7 +80,7 @@ void inizializza_pareti(Stanza *stanza)
         { { 10, 11 }, { 10, 13 } }
     };
 
-    Casella parete = { Parete, '#' };
+    Casella parete = { Parete, '#', false, true };
 
     for (int i = 0; i < N_PARETI; i++)
     {
@@ -123,15 +122,36 @@ void disegna_stanza(Stanza *stanza, Robot robot)
     }
 }
 
-void muovi_robot(Stanza *stanza, Robot *robot)
+void muovi_robot(Stanza *stanza, Robot *robot, Evento *evento)
 {
     Vettore2D direzione;
+    Vettore2D pos_casuale;
+    Casella nuova_casella;
+
+    stanza->griglia[robot->pos.y][robot->pos.x].calpestata = true;
+    // stanza->griglia[robot->pos.y][robot->pos.x].visuale = '.';
+
     direzione = scegli_direzione(stanza, *robot);
 
     robot->pos.y += direzione.y;
     robot->pos.x += direzione.x;
 
-    stanza->griglia[robot->pos.y][robot->pos.x].calpestata = true;
+    switch (stanza->griglia[robot->pos.y][robot->pos.x].tipo)
+    {
+        case Botola:
+            pos_casuale = genera_posizione(stanza);
+            robot->pos = pos_casuale;
+            evento->botola = true;
+            break;
+        case BucoNero:
+            evento->game_over = true;
+            break;
+        case Uscita:
+            evento->vinto = true;
+            break;
+        default:
+            break;
+    }
 }
 
 // Genera una posizione casuale nella mappa
@@ -164,12 +184,10 @@ Ostacolo trova_ostacolo(Stanza *stanza, Robot robot, Vettore2D dir)
         casella_temp = stanza->griglia[pos_temp.y][pos_temp.x];
         ostacolo.distanza++;
     }
-    while (casella_temp.tipo == Libera && !casella_temp.calpestata);
+    while (casella_temp.tipo != Parete && !casella_temp.calpestata);
 
     if (casella_temp.tipo == Parete)
         ostacolo.priorita = Alta;
-    else if (casella_temp.tipo == BucoNero)
-        ostacolo.priorita = Media;
     else if (casella_temp.calpestata)
         ostacolo.priorita = Bassa;
 
@@ -187,26 +205,47 @@ Vettore2D scegli_ddirezione(Stanza *stanza, Robot robot)
     };
 
     Ostacolo ostacoli[4];
-    int indice_dir = 0;
+    int max_distanza = 0;
 
     for (int i = 0; i < 4; i++)
     {
         ostacoli[i] = trova_ostacolo(stanza, robot, direzioni[i]);
         
-        if (ostacoli[i].distanza > ostacoli[indice_dir].distanza)
-            indice_dir = i;
-        else if (ostacoli[i].distanza == ostacoli[indice_dir].distanza)
+        if (ostacoli[i].distanza > max_distanza)
+            max_distanza = ostacoli[i].distanza;
+    }
+
+    return direzioni[scegli_candidato(ostacoli, max_distanza)];
+}
+
+int scegli_candidato(Ostacolo *ostacoli, int max_distanza)
+{
+    int candidati[4];
+    int n, indice_scelto = 0;
+
+    for (int i = 0; i < 4; i++)
+    {
+        if (ostacoli[i].distanza == max_distanza)
         {
-            if (ostacoli[i].priorita < ostacoli[indice_dir].priorita)
-                indice_dir = i;
-            else
-                indice_dir = rand() % 4;
+            candidati[n] = i;
+            n++;
         }
     }
 
-    // TODO: add candidates and choose random iterative between them
+    indice_scelto = candidati[0];
 
-    return direzioni[indice_dir];
+    for (int i = 1; i < n; i++)
+    {
+        int indice_temp = candidati[i];
+
+        if (ostacoli[indice_temp].priorita < ostacoli[indice_scelto].priorita)
+            indice_scelto = indice_temp;
+
+        else if (ostacoli[indice_temp].priorita == ostacoli[indice_scelto].priorita)
+            indice_scelto = (rand() % 2 ? indice_temp : indice_scelto);
+    }
+
+    return indice_scelto;
 }
 
 // TODO: remove (generated)
@@ -268,12 +307,12 @@ Vettore2D scegli_direzione(Stanza *stanza, Robot robot)
         }
     }
 
-    int random = rand() % 10;
-    if (random > 7)
-    {
-        int n = rand() % 4;
-        return direzioni[n];
-    }
+    //int random = rand() % 10;
+    //if (random > 6)
+    //{
+    //    int n = rand() % 4;
+    //    return direzioni[n];
+    //}
     
     return direzioni[indice_scelto];
 }

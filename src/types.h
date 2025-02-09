@@ -15,9 +15,8 @@ typedef enum
 
 typedef enum
 {
-    Bassa,
-    Media,
-    Alta  // = insuperabile
+    Bassa,  // casella gia' calpestata
+    Alta    // parete
 } PrioritaOstacolo;
 
 typedef enum
@@ -38,7 +37,7 @@ typedef struct
 {
     TipoCasella tipo;
     char visuale;    // Carattere con cui visualizzare la casella
-    bool calpestata;
+    bool calpestata; // Se il robot e' gia' passato per questa casella
     Vettore2D pos;
 } Casella;
 
@@ -59,5 +58,12 @@ typedef struct
     // Vettore2D direzione;
     PrioritaOstacolo priorita;
 } Ostacolo;
+
+typedef struct
+{
+    bool botola;
+    bool game_over;
+    bool vinto;
+} Evento;
 
 #endif /* Tipi_h */
