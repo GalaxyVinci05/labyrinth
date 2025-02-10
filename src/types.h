@@ -21,11 +21,12 @@ typedef enum
 
 typedef enum
 {
-    Su,
-    Giu,
-    Destra,
-    Sinistra
-} Direzione;
+    Nessuno,
+    DirRandom,
+    PosRandom,
+    GameOver,
+    Vinto
+} Evento;
 
 typedef struct
 {
@@ -44,6 +45,7 @@ typedef struct
 typedef struct
 {
     Casella griglia[DIMENSIONE][DIMENSIONE];
+    Evento evento;
 } Stanza;
 
 typedef struct
@@ -58,12 +60,5 @@ typedef struct
     // Vettore2D direzione;
     PrioritaOstacolo priorita;
 } Ostacolo;
-
-typedef struct
-{
-    bool botola;
-    bool game_over;
-    bool vinto;
-} Evento;
 
 #endif /* Tipi_h */

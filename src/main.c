@@ -4,7 +4,6 @@ int main(void)
 {
     Stanza stanza;
     Robot robot;
-    Evento evento;
 
     srand(time(NULL));    // Imposta il seed per la generazione pseudocasuale
 
@@ -17,8 +16,25 @@ int main(void)
     
     do
     {
+        switch (stanza.evento)
+        {
+            case DirRandom:
+                printf("\nDirezione casuale!");
+                break;
+            case PosRandom:
+                printf("\nBotola!");
+                break;
+            default:
+                printf("\n-");
+                break;
+        }
+
+        if (stanza.evento != Nessuno)
+            stanza.evento = Nessuno;
+
         printf("\nN. Passi: %d", passi);
         printf("\nPremi INVIO per continuare...\n");
+        printf("\n\n\n\n\n");
         input = getchar();
 
         // Se si incontra EOF termina arbitrariamente l'esecuzione.
@@ -27,28 +43,17 @@ int main(void)
 
         while (input != '\n');
 
-        muovi_robot(&stanza, &robot, &evento);
+        muovi_robot(&stanza, &robot);
         disegna_stanza(&stanza, robot);
         passi++;
-
-        if (evento.botola)
-        {
-            printf("\nBotola!\n");
-            evento.botola = false;
-        }
     }
-    while (!evento.game_over && !evento.vinto);
+    while (stanza.evento != GameOver && stanza.evento != Vinto);
 
-    if (evento.vinto)
-    {
-        printf("\nHai vinto!\n");
-        printf("\nN. Passi: %d", passi);
-    }
+    if (stanza.evento == Vinto)
+        printf("\n-\nN. Passi: %d\nHai vinto!", passi);
     else
-    {
-        printf("\nHai perso!\n");
-        printf("\nN. Passi: %d", passi);
-    }
+        printf("\n-\nN. Passi: %d\nHai perso!", passi);
 
+    printf("\n\n\n\n\n");
     return 0;
 }

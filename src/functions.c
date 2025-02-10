@@ -122,14 +122,14 @@ void disegna_stanza(Stanza *stanza, Robot robot)
     }
 }
 
-void muovi_robot(Stanza *stanza, Robot *robot, Evento *evento)
+void muovi_robot(Stanza *stanza, Robot *robot)
 {
     Vettore2D direzione;
     Vettore2D pos_casuale;
     Casella nuova_casella;
 
     stanza->griglia[robot->pos.y][robot->pos.x].calpestata = true;
-    // stanza->griglia[robot->pos.y][robot->pos.x].visuale = '.';
+    stanza->griglia[robot->pos.y][robot->pos.x].visuale = '.';
 
     direzione = scegli_direzione(stanza, *robot);
 
@@ -141,13 +141,13 @@ void muovi_robot(Stanza *stanza, Robot *robot, Evento *evento)
         case Botola:
             pos_casuale = genera_posizione(stanza);
             robot->pos = pos_casuale;
-            evento->botola = true;
+            stanza->evento = PosRandom;
             break;
         case BucoNero:
-            evento->game_over = true;
+            stanza->evento = GameOver;
             break;
         case Uscita:
-            evento->vinto = true;
+            stanza->evento = Vinto;
             break;
         default:
             break;
@@ -195,7 +195,7 @@ Ostacolo trova_ostacolo(Stanza *stanza, Robot robot, Vettore2D dir)
 }
 
 // Sceglie la direzione in base alla distanza e la priorita' degli ostacoli
-Vettore2D scegli_ddirezione(Stanza *stanza, Robot robot)
+Vettore2D scegli_direzione(Stanza *stanza, Robot robot)
 {
     Vettore2D direzioni[4] = {
         { -1, 0 },  // Su'
@@ -204,13 +204,22 @@ Vettore2D scegli_ddirezione(Stanza *stanza, Robot robot)
         { 0, -1 }   // Sinistra
     };
 
+    int random = rand() % 10;
+    if (random >= 7)
+    {
+        stanza->evento = DirRandom;
+        return genera_direzione(stanza, robot, direzioni);
+    }    
+
     Ostacolo ostacoli[4];
     int max_distanza = 0;
 
     for (int i = 0; i < 4; i++)
     {
+        // Salva gli ostacoli trovati nelle 4 direzioni
         ostacoli[i] = trova_ostacolo(stanza, robot, direzioni[i]);
         
+        // Salva la distanza massima trovata
         if (ostacoli[i].distanza > max_distanza)
             max_distanza = ostacoli[i].distanza;
     }
@@ -218,11 +227,27 @@ Vettore2D scegli_ddirezione(Stanza *stanza, Robot robot)
     return direzioni[scegli_candidato(ostacoli, max_distanza)];
 }
 
+Vettore2D genera_direzione(Stanza *stanza, Robot robot, Vettore2D *direzioni)
+{
+    Vettore2D direzione;
+    int n;
+
+    do
+    {
+        n = rand() % 4;
+        direzione = direzioni[n];
+    }
+    while (stanza->griglia[robot.pos.y + direzione.y][robot.pos.x + direzione.x].tipo == Parete);
+
+    return direzione;
+}
+
 int scegli_candidato(Ostacolo *ostacoli, int max_distanza)
 {
     int candidati[4];
-    int n, indice_scelto = 0;
+    int n = 0, indice_scelto = 0;
 
+    // Salva tutti gli indici che hanno la distanza massima
     for (int i = 0; i < 4; i++)
     {
         if (ostacoli[i].distanza == max_distanza)
@@ -232,88 +257,22 @@ int scegli_candidato(Ostacolo *ostacoli, int max_distanza)
         }
     }
 
+    // Se e' l'unico candidato, rimane tale
     indice_scelto = candidati[0];
 
+    // Ignorato se n = 1
     for (int i = 1; i < n; i++)
     {
         int indice_temp = candidati[i];
 
+        // Sceglie in base alla priorita'
         if (ostacoli[indice_temp].priorita < ostacoli[indice_scelto].priorita)
             indice_scelto = indice_temp;
 
+        // Se sono uguali, sceglie casualmente tra il candidato e l'indice salvato
         else if (ostacoli[indice_temp].priorita == ostacoli[indice_scelto].priorita)
             indice_scelto = (rand() % 2 ? indice_temp : indice_scelto);
     }
 
     return indice_scelto;
 }
-
-// TODO: remove (generated)
-Vettore2D scegli_direzione(Stanza *stanza, Robot robot)
-{
-    Vettore2D direzioni[4] = {
-        { -1, 0 },  // Su
-        { 1, 0 },   // Giù
-        { 0, 1 },   // Destra
-        { 0, -1 }   // Sinistra
-    };
-
-    Ostacolo ostacoli[4];
-    // Ottieni gli ostacoli per ogni direzione
-    for (int i = 0; i < 4; i++)
-    {
-        ostacoli[i] = trova_ostacolo(stanza, robot, direzioni[i]);
-    }
-    
-    // Trova il massimo valore di distanza
-    int max_distanza = -1;
-    for (int i = 0; i < 4; i++)
-    {
-        if (ostacoli[i].distanza > max_distanza)
-            max_distanza = ostacoli[i].distanza;
-    }
-    
-    // Raccogli gli indici che hanno la distanza massima
-    int candidati[4];
-    int num_candidati = 0;
-    for (int i = 0; i < 4; i++)
-    {
-        if (ostacoli[i].distanza == max_distanza)
-        {
-            candidati[num_candidati] = i;
-            num_candidati++;
-        }
-    }
-    
-    // Se c'è un solo candidato, lo scegliamo
-    int indice_scelto = candidati[0];
-    
-    // Se ce ne sono più di uno, scegliamo quello con la priorità migliore.
-    // Supponendo che un valore minore di Priorita sia migliore (ad esempio, Bassa = 0 < Media = 1 < Alta = 2)
-    for (int i = 1; i < num_candidati; i++)
-    {
-        int idx = candidati[i];
-        if (ostacoli[idx].priorita < ostacoli[indice_scelto].priorita)
-        {
-            indice_scelto = idx;
-        }
-        // Se la priorità è anch'essa uguale, possiamo decidere casualmente
-        else if (ostacoli[idx].priorita == ostacoli[indice_scelto].priorita)
-        {
-            if (rand() % 2)
-            {
-                indice_scelto = idx;
-            }
-        }
-    }
-
-    //int random = rand() % 10;
-    //if (random > 6)
-    //{
-    //    int n = rand() % 4;
-    //    return direzioni[n];
-    //}
-    
-    return direzioni[indice_scelto];
-}
-
