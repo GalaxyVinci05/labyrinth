@@ -1,8 +1,11 @@
-#ifndef Tipi_h
-#define Tipi_h
+#ifndef Strutture_h
+#define Strutture_h
 
-// Griglia 16x16
-#define DIMENSIONE 16
+// Strutture_h -> Definizioni di tutte le strutture dati utilizzate nel programma
+
+#define DIMENSIONE 16  // Griglia 16x16
+#define N_PARETI 4
+#define N_EVENTI 5
 
 typedef enum
 {
@@ -15,8 +18,8 @@ typedef enum
 
 typedef enum
 {
-    Bassa,  // casella gia' calpestata
-    Alta    // parete
+    Bassa,  // Casella gia' calpestata
+    Alta    // Parete
 } PrioritaOstacolo;
 
 typedef enum
@@ -37,27 +40,28 @@ typedef struct
 typedef struct
 {
     TipoCasella tipo;
-    char visuale;    // Carattere con cui visualizzare la casella
-    bool calpestata; // Se il robot e' gia' passato per questa casella
+    char visuale;    // Carattere con cui visualizzare la casella nell'output del programma
+    bool calpestata;
     Vettore2D pos;
 } Casella;
 
 typedef struct
 {
     Casella griglia[DIMENSIONE][DIMENSIONE];
-    Evento evento;
+    Evento eventi[N_EVENTI];
+    int eventi_attivi;
 } Stanza;
 
 typedef struct
 {
     char visuale;
     Vettore2D pos;
+    Vettore2D pos_precedente;
 } Robot;
 
 typedef struct
 {
     int distanza;
-    // Vettore2D direzione;
     PrioritaOstacolo priorita;
 } Ostacolo;
 
