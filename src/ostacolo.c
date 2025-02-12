@@ -1,5 +1,4 @@
 #include "../include/ostacolo.h"
-#include "../include/strutture.h"
 
 // Trova l'ostacolo lungo una direzione.
 // Input: stanza, robot, dir(ezione) -> una tra le quattro direzioni definite in scegli_direzione in robot.c

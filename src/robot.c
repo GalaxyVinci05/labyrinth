@@ -2,6 +2,9 @@
 #include "../include/stanza.h"
 #include "../include/ostacolo.h"
 
+// Imposta la nuova posizione del robot all'interno della stanza.
+// Input: stanza, robot
+// Output: posizione del robot e caselle della stanza variate
 void muovi_robott(Stanza *stanza, Robot *robot)
 {
     Vettore2D direzione;

@@ -3,7 +3,7 @@
 int main(void)
 {
     Stanza stanza;
-    Robot robot = { '*', { 8, 8 }, { -1, -1 } };
+    Robot robot = { '*', { 1, 3 }, { -1, -1 } };
 
     /*
     *  --- Struttura dati per creare le pareti interne ---
@@ -19,14 +19,14 @@ int main(void)
         //{ { 12, 7 }, { 12, 12 } }
         { { 2, 3 }, { 9, 3 } },
         { { 8, 7 }, { 14, 7 } },
-        { { 3, 7 }, { 3, 14 } },
+        { { 2, 4 }, { 2, 14 } },
         { { 10, 11 }, { 10, 13 } }
     };
 
     srand(time(NULL));  // Imposta il seed per la generazione di numeri pseudocasuali
 
     inizializza_stanza(&stanza, pareti);
-    disegna_stanza(&stanza, robot);
+    disegna_stanza(&stanza, robot);  // Disegna la stanza appena inizializzata
 
     int input, passi = 0;
     bool game_over = false, vinto = false;
@@ -83,7 +83,7 @@ int main(void)
             while (input != '\n');
 
             muovi_robot(&stanza, &robot);
-            disegna_stanza(&stanza, robot);
+            disegna_stanza(&stanza, robot);  // Aggiorna la stanza
             passi++;
         }
     }

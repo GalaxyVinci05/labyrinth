@@ -25,10 +25,10 @@ typedef enum
 typedef enum
 {
     Nessuno,
-    DirRandom,
-    PosRandom,
-    GameOver,
-    Vinto
+    DirRandom,  // Il robot ha scelto una direzione casuale
+    PosRandom,  // Il robot e' entrato in una botola
+    GameOver,   // Il robot e' entrato in un buco nero
+    Vinto       // Il robot e' uscito dall'uscita in basso a sinistra della stanza
 } Evento;
 
 typedef struct

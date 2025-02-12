@@ -1,5 +1,4 @@
 #include "../include/stanza.h"
-#include "../include/strutture.h"
 
 // Inizializza la stanza con tutti gli elementi del labirinto (pareti, buchi neri, botole, uscita).
 // Input: stanza, pareti (struttura definita e descritta in main.c)
@@ -80,7 +79,7 @@ void imposta_pareti(Stanza *stanza, Vettore2D pareti[N_PARETI][2])
     }
 }
 
-// Disegna la stanza casella per casella, e il robot all'interno di essa.
+// Disegna (o aggiorna) la stanza casella per casella, e il robot all'interno di essa.
 // Input: stanza, robot
 // Output: print della griglia del labirinto
 void disegna_stanza(Stanza *stanza, Robot robot)
