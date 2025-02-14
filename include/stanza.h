@@ -1,7 +1,7 @@
 #ifndef Stanza_h
 #define Stanza_h
 
-// Stanza_h -> Dichiarazioni delle funzioni inerenti all'inizializzazione e l'aggiornamento della stanza
+// Stanza_h -> Prototipi delle funzioni inerenti all'inizializzazione e l'aggiornamento della stanza
 
 #include <stdio.h>
 #include <stdlib.h>

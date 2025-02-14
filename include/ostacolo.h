@@ -1,7 +1,7 @@
 #ifndef Ostacolo_h
 #define Ostacolo_h
 
-// Ostacolo_h -> Dichiarazioni delle funzioni inerenti alla rilevazione degli ostacoli all'interno del labirinto
+// Ostacolo_h -> Prototipi delle funzioni inerenti alla rilevazione degli ostacoli all'interno del labirinto
 
 #include <stdlib.h>
 #include <stdbool.h>

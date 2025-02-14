@@ -1,7 +1,7 @@
 #ifndef Robot_h
 #define Robot_h
 
-// Robot_h -> Dichiarazioni delle funzioni inerenti al movimento del robot
+// Robot_h -> Prototipi delle funzioni inerenti al movimento del robot
 
 #include <stdio.h>
 #include <stdbool.h>
