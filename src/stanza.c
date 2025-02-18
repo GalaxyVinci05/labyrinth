@@ -32,7 +32,7 @@ void inizializza_stanza(Stanza *stanza, Vettore2D pareti[N_PARETI][2])
     imposta_pareti(stanza, pareti);
 
     // Imposta l'uscita 
-    Casella uscita = { Uscita, 'E', false };
+    Casella uscita = { Uscita, ' ', false };
     stanza->griglia[DIMENSIONE-2][0] = uscita;
 
     // Genera buchi neri e botole casualmente
@@ -79,9 +79,9 @@ void imposta_pareti(Stanza *stanza, Vettore2D pareti[N_PARETI][2])
     }
 }
 
-// Disegna (o aggiorna) la stanza casella per casella, e il robot all'interno di essa.
+// Disegna (o "aggiorna") la stanza casella per casella, e il robot all'interno di essa.
 // Input: stanza, robot
-// Output: print della griglia del labirinto
+// Output: stampa della griglia del labirinto
 void disegna_stanza(Stanza *stanza, Robot robot)
 {
     for (int i = 0; i < DIMENSIONE; i++)

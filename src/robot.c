@@ -5,24 +5,26 @@
 // Imposta la nuova posizione del robot all'interno della stanza.
 // Input: stanza, robot
 // Output: posizione del robot e caselle della stanza variate
-void muovi_robott(Stanza *stanza, Robot *robot)
+void muovi_robot(Stanza *stanza, Robot *robot)
 {
     Vettore2D direzione;
 
+    // Imposta la casella corrente come calpestata
     stanza->griglia[robot->pos.y][robot->pos.x].calpestata = true;
     stanza->griglia[robot->pos.y][robot->pos.x].visuale = '.';
 
     direzione = scegli_direzione(stanza, *robot);
 
+    // Somma alla posizione corrente del robot il vettore direzione
     robot->pos.y += direzione.y;
     robot->pos.x += direzione.x;
 
     switch (stanza->griglia[robot->pos.y][robot->pos.x].tipo)
     {
         case Botola:
-            robot->pos = genera_posizione(stanza);
-            stanza->eventi[stanza->eventi_attivi] = PosRandom;
-            stanza->eventi_attivi++;
+            robot->pos = genera_posizione(stanza);              // La posizione del robot assume un valore casuale
+            stanza->eventi[stanza->eventi_attivi] = PosRandom;  // Aggiunge l'evento
+            stanza->eventi_attivi++;                            // Incrementa il contatore di eventi
             break;
         case BucoNero:
             stanza->eventi[stanza->eventi_attivi] = GameOver;
@@ -37,55 +39,12 @@ void muovi_robott(Stanza *stanza, Robot *robot)
     }
 }
 
-// Imposta la nuova posizione del robot all'interno della stanza.
-// Input: stanza, robot
-// Output: posizione del robot e caselle della stanza variate
-void muovi_robot(Stanza *stanza, Robot *robot)
-{
-    Vettore2D direzione = scegli_direzione(stanza, *robot);
-    Vettore2D pos_vecchia;
-    
-    if (robot->pos_precedente.y > -1)
-    {
-        stanza->griglia[robot->pos_precedente.y][robot->pos_precedente.x].calpestata = false;
-        stanza->griglia[robot->pos_precedente.y][robot->pos_precedente.x].visuale = ' ';
-    }
-        
-    pos_vecchia = robot->pos;
-
-    robot->pos.y += direzione.y;
-    robot->pos.x += direzione.x;
-
-    robot->pos_precedente = pos_vecchia;
-    stanza->griglia[pos_vecchia.y][pos_vecchia.x].calpestata = true;
-    stanza->griglia[pos_vecchia.y][pos_vecchia.x].visuale = '.';
-
-    switch (stanza->griglia[robot->pos.y][robot->pos.x].tipo)
-    {
-        case Botola:
-            robot->pos = genera_posizione(stanza);
-            stanza->eventi[stanza->eventi_attivi] = PosRandom;
-            stanza->eventi_attivi++;
-            break;
-        case BucoNero:
-            stanza->eventi[stanza->eventi_attivi] = GameOver;
-            stanza->eventi_attivi++;
-            break;
-        case Uscita:
-            stanza->eventi[stanza->eventi_attivi] = Vinto;
-            stanza->eventi_attivi++;
-            break;
-        default:
-            break;
-    }
-
-}
-
-// Sceglie la direzione del robot in base alla distanza e la priorita' degli ostacoli.
+// Sceglie la direzione del robot in base alla distanza e la priorita' degli ostacoli, oppure casualmente.
 // Input: stanza, robot
 // Output: una tra le quattro direzioni definite nella funzione
 Vettore2D scegli_direzione(Stanza *stanza, Robot robot)
 {
+    // Array di vettori utilizzati per definire una "direzione" con 'y' e 'x': queste ultime verranno sommate alla 'y' e 'x' del robot
     Vettore2D direzioni[4] = {
         { -1, 0 },  // Su'
         { 1, 0 },   // Giu'
@@ -97,26 +56,23 @@ Vettore2D scegli_direzione(Stanza *stanza, Robot robot)
     int random = rand() % 10;
     if (random >= 7)
     {
-        // Attiva l'evento "Direzione casuale"
-        stanza->eventi[stanza->eventi_attivi] = DirRandom;
+        stanza->eventi[stanza->eventi_attivi] = DirRandom;  // Aggiunge l'evento "Direzione casuale"
         stanza->eventi_attivi++;
-        return genera_direzione(stanza, robot, direzioni);
-    }    
+        return genera_direzione(stanza, robot, direzioni);  // la funzione "scegli_direzione" restituira' un vettore "direzione" casuale
+    }
 
-    Ostacolo ostacoli[4];
-    int max_distanza = 0;
+    Ostacolo ostacoli[4];  // Contenitore per gli ostacoli trovati nelle 4 direzioni, con distanza associata
+    int max_distanza = 0;  // Distanza massima trovata
 
     for (int i = 0; i < 4; i++)
     {
-        // Salva gli ostacoli trovati nelle 4 direzioni
-        ostacoli[i] = trova_ostacolo(stanza, robot, direzioni[i]);
-        
-        // Salva la distanza massima trovata
+        ostacoli[i] = trova_ostacolo(stanza, robot, direzioni[i]);  // Individua l'ostacolo, la cui distanza e' il numero di caselle libere dal robot fino ad esso
+
         if (ostacoli[i].distanza > max_distanza)
             max_distanza = ostacoli[i].distanza;
     }
 
-    return direzioni[scegli_candidato(ostacoli, max_distanza)];
+    return direzioni[scegli_candidato(ostacoli, max_distanza)];  // Se ci sono piu' ostacoli con distanza = max_distanza, la funzione "scegli_candidato" scegliera' una singola direzione
 }
 
 // Genera una direzione casuale per il robot.
