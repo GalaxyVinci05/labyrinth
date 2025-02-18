@@ -111,7 +111,9 @@ Vettore2D genera_posizione(Stanza *stanza)
         pos.y = rand() % (DIMENSIONE-2) + 1;
         pos.x = rand() % (DIMENSIONE-2) + 1;
     }
-    while (stanza->griglia[pos.y][pos.x].tipo != Libera);  // Verificando che la casella sia di tipo 'Libera', assicura che la posizione generata non sovrapponga caselle gia' occupate
+    while (stanza->griglia[pos.y][pos.x].tipo != Libera || stanza->griglia[pos.y][pos.x-1].tipo == Uscita);
+    // Verificando che la casella sia di tipo 'Libera', assicura che la posizione generata non sovrapponga caselle gia' occupate.
+    // Evita inoltre di generare una posizione situata direttamente davanti all'uscita.
 
     return pos;
 }

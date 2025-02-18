@@ -27,7 +27,7 @@
 int main(void)
 {
     Stanza stanza;
-    Robot robot = { '*', { 14, 6 } };
+    Robot robot = { '*', { 8, 8 } };
 
     /*
     *  --- Struttura dati per creare le pareti interne ---
@@ -36,15 +36,10 @@ int main(void)
     *  E' previsto che si inserisca nella y o x finale un valore maggiore di quello nella y o x iniziale.
     */
     Vettore2D pareti[N_PARETI][2] = {
-        //{ { 2, 4 }, { 2, 8 } },
-        //{ { 6, 3 }, { 12, 3 } },
-        //{ { 4, 6 }, { 7, 6 } },
-        //{ { 8, 10 }, { 8, 14 } },
-        //{ { 12, 7 }, { 12, 12 } }
         { { 2, 3 }, { 9, 3 } },
         { { 8, 7 }, { 14, 7 } },
-        { { 2, 4 }, { 2, 14 } },
-        { { 13, 1 }, { 13, 14 } }
+        { { 3, 7 }, { 3, 14 } },
+        { { 10, 11 }, { 10, 13 } }
     };
 
     srand(time(NULL));  // Imposta il seed per la generazione di numeri pseudocasuali
